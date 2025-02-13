@@ -1,10 +1,15 @@
 #!/usr/bin/env -S python -u
+'Usage: client.py <host> <port>'
 
 import sys
 import socket
 import time
+import itertools
 
-BLOCK = b'x' * 20*10**4
+BLOCK = b'x' * 20*10**3
+BLOCK = 10000 * b'x'
+
+rotating = itertools.cycle('|/-\\')
 
 
 def log(msg):
@@ -18,8 +23,8 @@ class Sender:
         self.sock.connect((host, port))
         self.init = time.time()
         self.sent = 0
-        snd_buffer = self.sock.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
-        log(f'sending window size: {snd_buffer:,} B\n')
+        snd_buffer = self.sock.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF) // 1000
+        log(f'Sending buffer size: {snd_buffer:,} kB\n')
 
     def run(self):
         try:
@@ -29,19 +34,20 @@ class Sender:
 
     def sending(self):
         while 1:
-            self.stats()
-            self.sock.sendall(BLOCK)
-            self.sent += len(BLOCK)
+            self.show_stats()
+            self.sent += self.sock.send(BLOCK)
 
-    def stats(self):
+    def show_stats(self):
         elapsed = time.time() - self.init
         msg = f'sent:{self.sent//1000:,} kB, '
-        msg += f'rate:{self.sent/1000//elapsed:,.0f} kB/s'
-
-        log(f'\r{"-"*40}\r'); sys.stderr.flush()
+        msg += f'rate:{self.sent/1000//elapsed:,.0f} kBps'
+        log(f'\r ({next(rotating)}) {msg} {10 * " "}\r')
         time.sleep(0.01)
-        log(f'\r{" "*40}\r' + msg); sys.stderr.flush()
 
+
+if len(sys.argv) != 3:
+    print(__doc__)
+    sys.exit(1)
 
 host, port = sys.argv[1], int(sys.argv[2])
 Sender(host, port).run()
