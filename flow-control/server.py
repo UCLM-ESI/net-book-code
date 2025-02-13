@@ -4,7 +4,6 @@
 import sys
 import socket
 import time
-import struct
 
 
 def log(msg):
