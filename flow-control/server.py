@@ -54,7 +54,7 @@ class Receiver:
 
     def show_stats(self):
         msg = f'received:{self.received//1000:,} kB, '
-        msg += f'rate:{self.current_rate//1000:,.0f} kBps'
+        msg += f'rate:{self.current_rate/1000:,.0f} kBps'
         log(f'\r {msg} {10 * " "}\r')
 
 

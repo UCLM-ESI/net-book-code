@@ -21,12 +21,13 @@ class Sender:
     def __init__(self, host, port):
         self.sock = socket.socket()
         self.sock.connect((host, port))
-        self.init = time.time()
-        self.sent = 0
         snd_buffer = self.sock.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF) // 1000
         log(f'Sending buffer size: {snd_buffer:,} kB\n')
 
     def run(self):
+        self.sent = 0
+        self.init = time.time()
+
         try:
             self.sending()
         except KeyboardInterrupt:
@@ -40,7 +41,7 @@ class Sender:
     def show_stats(self):
         elapsed = time.time() - self.init
         msg = f'sent:{self.sent//1000:,} kB, '
-        msg += f'rate:{self.sent/1000//elapsed:,.0f} kBps'
+        msg += f'rate:{self.sent/1000/elapsed:,.0f} kBps'
         log(f'\r ({next(rotating)}) {msg} {10 * " "}\r')
         time.sleep(0.01)
 
@@ -49,5 +50,6 @@ if len(sys.argv) != 3:
     print(__doc__)
     sys.exit(1)
 
-host, port = sys.argv[1], int(sys.argv[2])
+host = sys.argv[1]
+port = int(sys.argv[2])
 Sender(host, port).run()
