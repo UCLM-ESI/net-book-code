@@ -9,21 +9,25 @@ def log(msg):
     sys.stderr.write(msg)
     sys.stderr.flush()
 
+
 class Receiver:
     def __init__(self, port):
         self.sock = socket.socket()
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
-
         self.sock.bind(('', port))
         self.sock.listen(1)
-        self.child, client = self.sock.accept()
-        self.init = time.time()
-        self.received = 0
 
     def run(self):
+        self.child, client = self.sock.accept()
+        self.received = 0
+        self.init = time.time()
+
         try:
             self.receiving()
         except KeyboardInterrupt:
+            pass
+        finally:
             self.sock.close()
 
     def receiving(self):
@@ -32,17 +36,21 @@ class Receiver:
             if not data:
                 break
 
-            self.stats()
             self.received += len(data)
+            self.show_stats()
 
             sys.stdout.buffer.write(data)
             sys.stdout.buffer.flush()
 
-    def stats(self):
+    def show_stats(self):
         elapsed = time.time() - self.init
-        msg = f'received:{self.received//1000:,} kB, '
-        msg += f'rate:{(self.received*8)/1000//elapsed:,.0f} kbps'
-        log(f'\r{" "*40}\r' + msg)
+        byterate = self.received / 1000 / elapsed
+        bitrate = byterate * 8
+
+        msg = f'received(kB):{self.received//1000:,}, '
+        msg += f'rate(kBps):{byterate:,.0f}, '
+        msg += f'rate(kbps):{bitrate:,.0f}'
+        log(f'\r {msg} {10 * " "}\r')
 
 
 port = int(sys.argv[1])
