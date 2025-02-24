@@ -6,7 +6,6 @@ import socket
 import time
 import itertools
 
-BLOCK = b'x' * 20*10**3
 BLOCK = 10000 * b'x'
 
 rotating = itertools.cycle('|/-\\')
