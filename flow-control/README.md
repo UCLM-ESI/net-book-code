@@ -6,3 +6,7 @@ Playing with TCP flow control
 - `lazy-server.py` waits for the user to press a key before receiving some data, then pauses again.
 
 You may observe that the client stops sending when the buffers are full and resumes once there is free space.
+
+Run this command to view socket variables:
+
+$ ss -timon sport = 2000 or dport = 2000
