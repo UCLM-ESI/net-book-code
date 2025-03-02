@@ -1,64 +1,65 @@
 #!/bin/bash
 
-#       192.168.1.0/24       10.0.0.0/30       10.0.0.4/30       192.168.2.0/24
-# Client ------------ R1 ---------------- R3 ---------------- R2 ------------ Server
-#                     veth1        veth2  veth3        veth4  veth5
+#         0.0/24             1.0/24              2.0/24             3.0/24
+# host ------------- R01 --------------- R12 -------------- R23 ------------ Server
+#  0.1            0.2 | 1.1           1.2 | 2.1          2.2 | 3.1           3.2
 
-#!/bin/bash
+
+set -x
 
 # Crear network namespaces para los routers
-for ns in R01 R12 R02; do
+for ns in R01 R12 R23 Server; do
     ip netns add $ns
 done
 
 # Crear enlaces virtuales (veth pairs)
-ip link add veth-R01 type veth peer name veth-R01-R12
-ip link add veth-R01-R12 type veth peer name veth-R12
-ip link add veth-R12-R02 type veth peer name veth-R02
-ip link add veth-R02 type veth peer name veth-host
+ip link add R01.0 type veth peer name Host.0
+ip link add R01.1 type veth peer name R12.1
+ip link add R12.2 type veth peer name R23.2
+ip link add R23.3 type veth peer name Server.3
 
-# Asignar interfaces a los namespaces correspondientes
-ip link set veth-R01 netns R01
-ip link set veth-R01-R12 netns R01
-ip link set veth-R12 netns R12
-ip link set veth-R12-R02 netns R12
-ip link set veth-R02 netns R02
+# Asignar interfaces a los namespaces
+ip link set R01.0 netns R01
+ip link set R01.1 netns R01
+ip link set R12.1 netns R12
+ip link set R12.2 netns R12
+ip link set R23.2 netns R23
+ip link set R23.3 netns R23
+ip link set Server.3 netns Server
 
+# Activar interfaces a namespaces
+ip link set Host.0 up
+ip netns exec R01 ip link set R01.0 up
+ip netns exec R01 ip link set R01.1 up
+ip netns exec R12 ip link set R12.1 up
+ip netns exec R12 ip link set R12.2 up
+ip netns exec R23 ip link set R23.2 up
+ip netns exec R23 ip link set R23.3 up
+ip netns exec Server ip link set Server.3 up
 
-# Configuración de direcciones IP
-# Red 1 (N1)
-ip netns exec R01 ip addr add 192.168.1.1/24 dev veth-R01
-ip netns exec R01 ip addr add 10.0.0.1/30 dev veth-R01-R12
+# Asignar IPs
+ip addr add 10.0.0.1/24 dev Host.0
 
-# Red 2 (N2)
-ip netns exec R12 ip addr add 10.0.0.2/30 dev veth-R01-R12
-ip netns exec R12 ip addr add 10.0.0.5/30 dev veth-R12-R02
+ip netns exec R01 ip addr add 10.0.0.2/24 dev R01.0
+ip netns exec R01 ip addr add 10.0.1.1/24 dev R01.1
 
-# Servidor en la Red 2
-ip netns exec R02 ip addr add 192.168.2.1/24 dev veth-R02
-ip netns exec R02 ip addr add 10.0.0.6/30 dev veth-R12-R02
+ip netns exec R12 ip addr add 10.0.1.2/24 dev R12.1
+ip netns exec R12 ip addr add 10.0.2.1/24 dev R12.2
 
-# Configuración de las interfaces de red para el cliente y servidor (host)
-ip addr add 192.168.1.100/24 dev veth-host   # Cliente (host)
-ip addr add 192.168.2.100/24 dev veth-host   # Servidor (host)
+ip netns exec R23 ip addr add 10.0.2.2/24 dev R23.2
+ip netns exec R23 ip addr add 10.0.3.1/24 dev R23.3
 
-# Activar interfaces en todos los namespaces
-for ns in R01 R12 R02; do
-    ip netns exec $ns ip link set lo up
-    ip netns exec $ns ip link set veth-R01 up || true
-    ip netns exec $ns ip link set veth-R01-R12 up || true
-    ip netns exec $ns ip link set veth-R12 up || true
-    ip netns exec $ns ip link set veth-R12-R02 up || true
-    ip netns exec $ns ip link set veth-R02 up || true
-done
+ip netns exec Server ip addr add 10.0.3.2/24 dev Server.3
 
-# Habilitar encaminamiento IP en los routers
-for ns in R01 R12 R02; do
+# Habilitar reenvío en los routers
+for ns in R01 R12 R23; do
     ip netns exec $ns sysctl -w net.ipv4.ip_forward=1
 done
 
-# Configuración de rutas estáticas
-ip netns exec R01 ip route add 192.168.2.0/24 via 10.0.0.2
-ip netns exec R12 ip route add 192.168.1.0/24 via 10.0.0.5
-ip route add 192.168.1.0/24 via 192.168.2.1  # Desde el Cliente hacia el Servidor
-ip route add 192.168.2.0/24 via 192.168.1.1  # Desde el Servidor hacia el Cliente
+# Rutas
+ip route add 10.0.0.0/16 via 10.0.0.2 dev Host.0
+ip netns exec R01 ip route add default via 10.0.1.2 dev R01.1
+ip netns exec R12 ip route add 10.0.0.0/24 via 10.0.1.1 dev R12.1
+ip netns exec R12 ip route add 10.0.3.0/24 via 10.0.2.2 dev R12.2
+ip netns exec R23 ip route add default via 10.0.2.1 dev R23.2
+ip netns exec Server ip route add default via 10.0.3.1 dev Server.3
