@@ -1,18 +1,18 @@
 #!/bin/bash
 
-#         0.0/24             1.0/24              2.0/24             3.0/24
-# host ------------- R01 --------------- R12 -------------- R23 ------------ Server
-#  0.1            0.2 | 1.1           1.2 | 2.1          2.2 | 3.1           3.2
+#         0.0/24           1.0/24           2.0/24           3.0/24
+# host ------------ R01 ------------ R12 ------------ R23 ------------ Server
+#  0.1           0.2 | 1.1        1.2 | 2.1        2.2 | 3.1          s 3.2
 
 
 set -x
 
-# Crear network namespaces para los routers
+# Crear namespaces
 for ns in R01 R12 R23 Server; do
     ip netns add $ns
 done
 
-# Crear enlaces virtuales (veth pairs)
+# Crear enlaces virtuales
 ip link add R01.0 type veth peer name Host.0
 ip link add R01.1 type veth peer name R12.1
 ip link add R12.2 type veth peer name R23.2
@@ -27,7 +27,7 @@ ip link set R23.2 netns R23
 ip link set R23.3 netns R23
 ip link set Server.3 netns Server
 
-# Activar interfaces a namespaces
+# Activar interfaces
 ip link set Host.0 up
 ip netns exec R01 ip link set R01.0 up
 ip netns exec R01 ip link set R01.1 up
