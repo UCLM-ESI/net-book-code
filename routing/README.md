@@ -71,7 +71,6 @@ Check config:
     !
     frr version 8.4.4
     frr defaults traditional
-    hostname fry
     no ipv6 forwarding
     service integrated-vtysh-config
     !
@@ -85,7 +84,7 @@ Check config:
 
 Show basic routing info:
 
-    # ip netns exec R01 vtysh -c "show ip route"
+    # ip netns exec R23 vtysh -c "show ip route"
     Codes: K - kernel route, C - connected, S - static, R - RIP,
         O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
         T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
@@ -93,14 +92,14 @@ Show basic routing info:
         > - selected route, * - FIB route, q - queued, r - rejected, b - backup
         t - trapped, o - offload failure
 
-    R>* 10.0.0.0/24 [120/3] via 10.0.2.1, R23.2, weight 1, 00:03:49
-    R>* 10.0.1.0/24 [120/2] via 10.0.2.1, R23.2, weight 1, 00:03:49
-    C>* 10.0.2.0/24 is directly connected, R23.2, 00:03:50
-    C>* 10.0.3.0/24 is directly connected, R23.3, 00:03:50
+    R>* 10.0.0.0/24 [120/3] via 10.0.2.1, R23.e2, weight 1, 00:03:49
+    R>* 10.0.1.0/24 [120/2] via 10.0.2.1, R23.e2, weight 1, 00:03:49
+    C>* 10.0.2.0/24 is directly connected, R23.e2, 00:03:50
+    C>* 10.0.3.0/24 is directly connected, R23.e3, 00:03:50
 
 Show RIP info:
 
-    # ip netns exec R01 vtysh -c "show ip rip"
+    # ip netns exec R23 vtysh -c "show ip rip"
     Codes: R - RIP, C - connected, S - Static, O - OSPF, B - BGP
     Sub-codes:
         (n) - normal, (s) - static, (d) - default, (r) - redistribute,

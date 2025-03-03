@@ -1,0 +1,52 @@
+services:
+  r01:
+    build: ./router
+    container_name: R01
+    privileged: true
+    networks:
+      N0:
+        ipv4_address: 10.0.0.2
+      N1:
+        ipv4_address: 10.0.1.1
+
+  r12:
+    build: ./router
+    container_name: R12
+    privileged: true
+    networks:
+      N1:
+        ipv4_address: 10.0.1.2
+      N2:
+        ipv4_address: 10.0.2.1
+
+  r23:
+    build: ./router
+    container_name: R23
+    privileged: true
+    networks:
+      N2:
+        ipv4_address: 10.0.2.2
+      N3:
+        ipv4_address: 10.0.3.1
+
+networks:
+  N0:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+  N1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+  N2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24
+  N3:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.3.0/24
