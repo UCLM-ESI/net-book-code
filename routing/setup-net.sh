@@ -1,9 +1,5 @@
 #!/bin/bash
 
-#         0.0/24           1.0/24           2.0/24           3.0/24
-# host ------------ R01 ------------ R12 ------------ R23 ------------ Server
-#  0.1           0.2 | 1.1        1.2 | 2.1        2.2 | 3.1          s 3.2
-
 
 set -x
 
@@ -56,5 +52,8 @@ for ns in R01 R12 R23; do
     ip netns exec $ns sysctl -w net.ipv4.ip_forward=1
 done
 
-# ruta iface local
+# gw local Host
 ip route add 10.0.0.0/16 via 10.0.0.2 dev Host.0
+
+# gw local Server
+ip netns exec Server ip route add default via 10.0.3.1 dev Server.3
