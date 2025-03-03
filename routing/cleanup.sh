@@ -1,12 +1,11 @@
 #!/bin/bash
 
-# Eliminar las rutas de los routers
-ip netns exec R01 ip route flush table main
-ip netns exec R12 ip route flush table main
-ip netns exec R23 ip route flush table main
-ip netns exec Server ip route flush table main
+# Eliminar rutas
+for ns in R01 R12 R23 Server; do
+    ip netns exec $ns ip route flush table main
+done
 
-# Desactivar las interfaces en cada namespace
+# Desactivar interfaces
 ip link set Host.0 down
 ip netns exec R01 ip link set R01.0 down
 ip netns exec R01 ip link set R01.1 down
@@ -16,17 +15,12 @@ ip netns exec R23 ip link set R23.2 down
 ip netns exec R23 ip link set R23.3 down
 ip netns exec Server ip link set Server.3 down
 
-# Eliminar las interfaces virtuales (veth pairs)
-ip link delete Host.0
-ip link delete R01.0
-ip link delete R01.1
-ip link delete R12.1
-ip link delete R12.2
-ip link delete R23.2
-ip link delete R23.3
-ip link delete Server.3
+# Eliminar interfaces
+for iface in Host.0 R01.0 R01.1 R12.1 R12.2 R23.2 R23.3 Server.3; do
+    sudo ip link delete $iface
+done
 
-# Eliminar los network namespaces
+# Eliminar namespaces
 for ns in R01 R12 R23 Server; do
     sudo ip netns del $ns
 done
