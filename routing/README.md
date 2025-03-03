@@ -44,9 +44,9 @@ Traceroute:
     3  10.0.2.2 (10.0.2.2)  0.012 ms  0.005 ms  0.006 ms
     4  10.0.3.2 (10.0.3.2)  0.011 ms  0.006 ms  0.006 ms
 
-Netcat:
+Netcat (echo):
 
-    # ip netns exec Server ncat -lp 2000 -c cat  # mimic echo server
+    # ip netns exec Server ncat -lp 2000 -c cat
 
     Other shell:
 
