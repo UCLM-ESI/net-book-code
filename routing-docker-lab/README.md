@@ -66,7 +66,7 @@ Check config:
     !
     end
 
-Show basic routing info:
+Show routing info:
 
     $ docker compose exec r01 vtysh -c "show ip route"
     Codes: K - kernel route, C - connected, S - static, R - RIP,
@@ -94,3 +94,66 @@ Show RIP info:
     C(i) 10.0.1.0/24        0.0.0.0               1 self              0
     R(n) 10.0.2.0/24        10.0.1.3              2 10.0.1.3          0 02:33
     R(n) 10.0.3.0/24        10.0.1.3              3 10.0.1.3          0 02:33
+
+
+## OSPF
+
+Setup:
+
+    $ make restart
+    $ sudo ./fix-bridge-addrs.sh
+    $ ./setup-ospf.sh
+
+Show routing info:
+
+    $ docker compose exec r01 vtysh -c "show ip route"
+    Codes: K - kernel route, C - connected, S - static, R - RIP,
+        O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+        T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+        f - OpenFabric,
+        > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+        t - trapped, o - offload failure
+
+    O   10.0.0.0/24 [110/10] is directly connected, eth1, weight 1, 00:00:05
+    C>* 10.0.0.0/24 is directly connected, eth1, 00:00:11
+    O   10.0.1.0/24 [110/10] is directly connected, eth0, weight 1, 00:00:05
+    C>* 10.0.1.0/24 is directly connected, eth0, 00:00:11
+
+
+Show OSPF info:
+
+    $ docker compose exec r01 vtysh -c "show ip ospf"
+    OSPF Routing Process, Router ID: 10.0.1.2
+    Supports only single TOS (TOS0) routes
+    This implementation conforms to RFC2328
+    RFC1583Compatibility flag is disabled
+    OpaqueCapability flag is disabled
+    Initial SPF scheduling delay 0 millisec(s)
+    Minimum hold time between consecutive SPFs 50 millisec(s)
+    Maximum hold time between consecutive SPFs 5000 millisec(s)
+    Hold time multiplier is currently 1
+    SPF algorithm last executed 18.868s ago
+    Last SPF duration 62 usecs
+    SPF timer is inactive
+    LSA minimum interval 5000 msecs
+    LSA minimum arrival 1000 msecs
+    Write Multiplier set to 20
+    Refresh timer 10 secs
+    Maximum multiple paths(ECMP) supported 256
+    Administrative distance 110
+    Number of external LSA 0. Checksum Sum 0x00000000
+    Number of opaque AS LSA 0. Checksum Sum 0x00000000
+    Number of areas attached to this router: 1
+    Area ID: 0.0.0.0 (Backbone)
+    Number of interfaces in this area: Total: 2, Active: 2
+    Number of fully adjacent neighbors in this area: 0
+    Area has no authentication
+    SPF algorithm executed 1 times
+    Number of LSA 1
+    Number of router LSA 1. Checksum Sum 0x000019e5
+    Number of network LSA 0. Checksum Sum 0x00000000
+    Number of summary LSA 0. Checksum Sum 0x00000000
+    Number of ASBR summary LSA 0. Checksum Sum 0x00000000
+    Number of NSSA LSA 0. Checksum Sum 0x00000000
+    Number of opaque link LSA 0. Checksum Sum 0x00000000
+    Number of opaque area LSA 0. Checksum Sum 0x00000000
