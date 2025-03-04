@@ -5,9 +5,9 @@ services:
     privileged: true
     networks:
       N0:
-        ipv4_address: 10.0.0.2
+        ipv4_address: 10.0.0.3
       N1:
-        ipv4_address: 10.0.1.1
+        ipv4_address: 10.0.1.2
 
   r12:
     build: ./router
@@ -15,9 +15,9 @@ services:
     privileged: true
     networks:
       N1:
-        ipv4_address: 10.0.1.2
+        ipv4_address: 10.0.1.3
       N2:
-        ipv4_address: 10.0.2.1
+        ipv4_address: 10.0.2.2
 
   r23:
     build: ./router
@@ -25,9 +25,9 @@ services:
     privileged: true
     networks:
       N2:
-        ipv4_address: 10.0.2.2
+        ipv4_address: 10.0.2.3
       N3:
-        ipv4_address: 10.0.3.1
+        ipv4_address: 10.0.3.2
 
 networks:
   N0:
