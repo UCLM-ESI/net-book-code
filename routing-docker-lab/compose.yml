@@ -1,8 +1,18 @@
+#            0.0/24           1.0/24           2.0/24           3.0/24
+#    host ------------ R01 ------------ R12 ------------ R23 ------------ Server
+#       0.2         0.3 | 1.2        1.3 | 2.2        2.3 | 3.2          3.3
+
+
+
 services:
   r01:
     build: ./router
-    container_name: R01
+    container_name: r01
+    hostname: r01
     privileged: true
+    volumes:
+      - ./rip/R01-ripd.conf:/etc/frr/ripd.conf
+      - ./ospf/R01-ospfd.conf:/etc/frr/ospfd.conf
     networks:
       N0:
         ipv4_address: 10.0.0.3
@@ -11,8 +21,12 @@ services:
 
   r12:
     build: ./router
-    container_name: R12
+    container_name: r12
+    hostname: r12
     privileged: true
+    volumes:
+      - ./rip/R12-ripd.conf:/etc/frr/ripd.conf
+      - ./ospf/R12-ospfd.conf:/etc/frr/ospfd.conf
     networks:
       N1:
         ipv4_address: 10.0.1.3
@@ -21,13 +35,26 @@ services:
 
   r23:
     build: ./router
-    container_name: R23
+    container_name: r23
+    hostname: r23
     privileged: true
+    volumes:
+      - ./rip/R23-ripd.conf:/etc/frr/ripd.conf
+      - ./ospf/R23-ospfd.conf:/etc/frr/ospfd.conf
     networks:
       N2:
         ipv4_address: 10.0.2.3
       N3:
         ipv4_address: 10.0.3.2
+
+  server:
+    build: ./server
+    container_name: server
+    privileged: true
+    networks:
+      N3:
+        ipv4_address: 10.0.3.3
+
 
 networks:
   N0:

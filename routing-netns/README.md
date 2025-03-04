@@ -14,8 +14,8 @@
 
 Setup:
 
-    ./setup-net.sh
-    ./setup-static.sh
+    $ ./setup-net.sh
+    $ ./setup-static.sh
 
 Show routing tables:
 
@@ -35,7 +35,7 @@ Ping Server:
     1 packets transmitted, 1 received, 0% packet loss, time 0ms
     rtt min/avg/max/mdev = 0.043/0.043/0.043/0.000 ms
 
-Traceroute:
+Traceroute Server:
 
     # traceroute 10.0.3.2
     traceroute to 10.0.3.2 (10.0.3.2), 30 hops max, 60 byte packets
