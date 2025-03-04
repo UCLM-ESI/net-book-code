@@ -1,5 +1,6 @@
 
 up:
+	docker build -t router router
 	docker compose up --remove-orphans -d
 
 down:
