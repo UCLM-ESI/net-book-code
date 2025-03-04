@@ -3,11 +3,15 @@
 #       0.2         0.3 | 1.2        1.3 | 2.2        2.3 | 3.2          3.3
 
 
+
 services:
   r01:
     build: ./router
     container_name: r01
+    hostname: r01
     privileged: true
+    volumes:
+      - ./rip/R01-ripd.conf:/etc/frr/ripd.conf
     networks:
       N0:
         ipv4_address: 10.0.0.3
@@ -17,7 +21,10 @@ services:
   r12:
     build: ./router
     container_name: r12
+    hostname: r12
     privileged: true
+    volumes:
+      - ./rip/R12-ripd.conf:/etc/frr/ripd.conf
     networks:
       N1:
         ipv4_address: 10.0.1.3
@@ -27,7 +34,10 @@ services:
   r23:
     build: ./router
     container_name: r23
+    hostname: r23
     privileged: true
+    volumes:
+      - ./rip/R23-ripd.conf:/etc/frr/ripd.conf
     networks:
       N2:
         ipv4_address: 10.0.2.3

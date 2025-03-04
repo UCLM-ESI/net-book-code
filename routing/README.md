@@ -14,8 +14,8 @@
 
 Setup:
 
-    ./setup-net.sh
-    ./setup-static.sh
+    $ ./setup-net.sh
+    $ ./setup-static.sh
 
 Show routing tables:
 

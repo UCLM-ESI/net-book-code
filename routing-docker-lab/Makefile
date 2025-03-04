@@ -5,5 +5,7 @@ up:
 down:
 	docker compose down
 
+restart: down build up
+
 build:
 	docker compose build
