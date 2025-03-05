@@ -10,3 +10,15 @@ restart: down build up
 
 build:
 	docker compose build
+
+clean: down
+	docker rmi router server
+
+static: restart
+	sudo ./fix-bridge-addrs.sh
+	./setup-static.sh
+
+.PHONY: rip
+rip: restart
+	sudo ./fix-bridge-addrs.sh
+	./setup-rip.sh
