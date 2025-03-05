@@ -22,3 +22,7 @@ static: restart
 rip: restart
 	sudo ./fix-bridge-addrs.sh
 	./setup-rip.sh
+
+ospf: restart
+	sudo ./fix-bridge-addrs.sh
+	./setup-ospf.sh
