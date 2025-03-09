@@ -1,23 +1,19 @@
-
-
 ## Topology:
 
-            0.0/24           1.0/24           2.0/24           3.0/24
-    host ------------ R01 ------------ R12 ------------ R23 ------------ Server
-       0.2         0.3 | 1.2        1.3 | 2.2        2.3 | 3.2          3.3
+      10.0.0.0/24     10.0.1.0/24      10.0.2.0/24      10.0.3.0/24
+Host ------------- R1 ------------- R2 ------------- R3 ------------- Server
+   0.2          0.3 | 1.2        1.3 | 2.2        2.3 | 3.2          3.3
 
 
 ## Static routing
 
 Setup:
 
-    $ make restart
-    $ sudo ./fix-bridge-addrs.sh
-    $ ./setup-static.sh
+    $ make static
 
 Show routing tables:
 
-    $ docker compose exec r01 ip route
+    $ docker exec r1 ip route
     default via 10.0.1.3 dev eth1
     10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.3
     10.0.1.0/24 dev eth1 proto kernel scope link src 10.0.1.2
@@ -41,20 +37,18 @@ Traceroute Server:
 
 Setup:
 
-    $ make restart
-    $ sudo ./fix-bridge-addrs.sh
-    $ ./setup-rip.sh
+    $ make rip
 
 Check config:
 
-    $ docker compose exec r01 vtysh -c "show running-config"
+    $ docker exec r1 vtysh -c "show running-config"
     Building configuration...
 
     Current configuration:
     !
     frr version 8.4.4
     frr defaults traditional
-    hostname r01
+    hostname r1
     no ipv6 forwarding
     service integrated-vtysh-config
     !
@@ -68,7 +62,7 @@ Check config:
 
 Show routing info:
 
-    $ docker compose exec r01 vtysh -c "show ip route"
+    $ docker exec r1 vtysh -c "show ip route"
     Codes: K - kernel route, C - connected, S - static, R - RIP,
         O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
         T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
@@ -83,7 +77,7 @@ Show routing info:
 
 Show RIP info:
 
-    $ docker compose exec r01 vtysh -c "show ip rip"
+    $ docker exec r1 vtysh -c "show ip rip"
     Codes: R - RIP, C - connected, S - Static, O - OSPF, B - BGP
     Sub-codes:
         (n) - normal, (s) - static, (d) - default, (r) - redistribute,
@@ -100,13 +94,11 @@ Show RIP info:
 
 Setup:
 
-    $ make restart
-    $ sudo ./fix-bridge-addrs.sh
-    $ ./setup-ospf.sh
+    $ make ospf
 
 Show routing info:
 
-    $ docker compose exec r01 vtysh -c "show ip route"
+    $ docker exec r1 vtysh -c "show ip route"
     Codes: K - kernel route, C - connected, S - static, R - RIP,
         O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
         T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
@@ -122,7 +114,7 @@ Show routing info:
 
 Show OSPF info:
 
-    $ docker compose exec r01 vtysh -c "show ip ospf"
+    $ docker exec r1 vtysh -c "show ip ospf"
     OSPF Routing Process, Router ID: 10.0.1.2
     Supports only single TOS (TOS0) routes
     This implementation conforms to RFC2328
