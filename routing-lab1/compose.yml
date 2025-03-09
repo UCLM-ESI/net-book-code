@@ -62,7 +62,7 @@ services:
     build: ./server
     image: server
     container_name: server
-    privileged: true
+    <<: *default-settings
     depends_on:
       - r01
     networks:
