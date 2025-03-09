@@ -2,6 +2,7 @@
 up:
 	docker build -t router router
 	docker compose up --remove-orphans -d
+	sudo ./fix-bridge-addrs.sh
 
 down:
 	docker compose down
@@ -15,14 +16,11 @@ clean: down
 	docker rmi router server
 
 static: restart
-	sudo ./fix-bridge-addrs.sh
 	./setup-static.sh
 
 .PHONY: rip
 rip: restart
-	sudo ./fix-bridge-addrs.sh
 	./setup-rip.sh
 
 ospf: restart
-	sudo ./fix-bridge-addrs.sh
 	./setup-ospf.sh
