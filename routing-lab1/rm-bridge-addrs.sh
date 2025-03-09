@@ -20,9 +20,3 @@ echo Removing bridge addresses...
 for bridge in $(docker network ls --filter "driver=bridge" | grep "$(basename $(pwd))" | grep -v N0 | awk '{print $1}'); do
     flush_ips $bridge
 done
-
-echo Set lab default route...
-
-if ! ip route show | grep -q '10.0.0.0/16 via 10.0.0.3'; then
-    sudo ip route add 10.0.0.0/16 via 10.0.0.3
-fi

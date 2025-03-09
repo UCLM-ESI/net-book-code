@@ -2,13 +2,13 @@
 #    host ------------ R01 ------------ R12 ------------ R23 ------------ Server
 #       0.2         0.3 | 1.2        1.3 | 2.2        2.3 | 3.2          3.3
 
-x-common: &default-settings
+x-common: &common-settings
   privileged: true
+  restart: "no"
   ulimits:
     nofile:
       soft: 100000
       hard: 200000
-  restart: no
 
 services:
   r01:
@@ -16,58 +16,51 @@ services:
     image: router
     container_name: r01
     hostname: r01
-    <<: *default-settings
+    <<: *common-settings
     volumes:
       - ./rip/R01-ripd.conf:/etc/frr/ripd.conf
       - ./ospfd.conf:/etc/frr/ospfd.conf
     networks:
-      N0:
-        ipv4_address: 10.0.0.3
-      N1:
-        ipv4_address: 10.0.1.2
+      N0: { ipv4_address: 10.0.0.3 }
+      N1: { ipv4_address: 10.0.1.2 }
 
   r12:
     image: router
     container_name: r12
     hostname: r12
-    <<: *default-settings
+    <<: *common-settings
     depends_on:
       - r01
     volumes:
       - ./rip/R12-ripd.conf:/etc/frr/ripd.conf
       - ./ospfd.conf:/etc/frr/ospfd.conf
     networks:
-      N1:
-        ipv4_address: 10.0.1.3
-      N2:
-        ipv4_address: 10.0.2.2
+      N1: { ipv4_address: 10.0.1.3 }
+      N2: { ipv4_address: 10.0.2.2 }
 
   r23:
     image: router
     container_name: r23
     hostname: r23
-    <<: *default-settings
+    <<: *common-settings
     depends_on:
       - r01
     volumes:
       - ./rip/R23-ripd.conf:/etc/frr/ripd.conf
       - ./ospfd.conf:/etc/frr/ospfd.conf
     networks:
-      N2:
-        ipv4_address: 10.0.2.3
-      N3:
-        ipv4_address: 10.0.3.2
+      N2: { ipv4_address: 10.0.2.3 }
+      N3: { ipv4_address: 10.0.3.2 }
 
   server:
     build: ./server
     image: server
     container_name: server
-    <<: *default-settings
+    <<: *common-settings
     depends_on:
       - r01
     networks:
-      N3:
-        ipv4_address: 10.0.3.3
+      N3: { ipv4_address: 10.0.3.3 }
 
 networks:
   N0:

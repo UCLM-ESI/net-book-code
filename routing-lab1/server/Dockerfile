@@ -6,5 +6,4 @@ RUN apt-get update && \
 
 CMD ["sh", "-c", \
     "ip route del default && \
-    ip route add default via 10.0.3.2 && \
     exec sleep infinity"]

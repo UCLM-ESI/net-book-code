@@ -2,7 +2,8 @@
 up:
 	docker build -t router router
 	docker compose up --remove-orphans -d
-	sudo ./fix-bridge-addrs.sh
+	sudo ./rm-bridge-addrs.sh
+	sudo ./setup-hosts.sh
 
 down:
 	docker compose down
