@@ -1,6 +1,6 @@
 ## Topology:
 
-<img src="topology.png" width="100%">
+<img src="topology.png" width="90%">
 
 
 ## Static routing
