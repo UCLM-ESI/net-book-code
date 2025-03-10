@@ -1,6 +1,6 @@
 
 up:
-	docker build -t router router
+	docker build -t lab2-router router
 	docker compose up --remove-orphans -d
 	sudo ./rm-bridge-addrs.sh
 	sudo ./setup-hosts.sh

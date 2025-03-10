@@ -1,14 +1,6 @@
 ## Topology
 
-                         1.3  2.2
-                            R2
-                        /       \
-                1.0/24 /         \ 2.0/24
-                      /           \
-                     / 1.2         \ 2.3
-host ------------ R1 -------------- R3 ------------ server
-  0.2          0.3  3.2          3.3  4.2           4.3
-       0.0/24            3.0/24            4.0/24
+<img src="topology.png" width="90%">
 
 
 ## Static routing
@@ -20,24 +12,25 @@ Setup:
 Show routing tables:
 
     $ docker exec r1 ip route
-    default via 10.0.3.3 dev eth2
-    10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.3
-    10.0.1.0/24 dev eth1 proto kernel scope link src 10.0.1.2
-    10.0.3.0/24 dev eth2 proto kernel scope link src 10.0.3.2
+    default via 10.0.4.3 dev eth1
+    10.0.0.0/24 dev eth2 proto kernel scope link src 10.0.0.3
+    10.0.1.0/24 dev eth0 proto kernel scope link src 10.0.1.2
+    10.0.4.0/24 dev eth1 proto kernel scope link src 10.0.4.2
 
 Ping Server:
 
-    $ ping -c1 10.0.4.3
-    PING 10.0.4.3 (10.0.4.3) 56(84) bytes of data.
-    64 bytes from 10.0.4.3: icmp_seq=1 ttl=62 time=0.065 ms
+    $ ping -c1 10.0.3.3
+    PING 10.0.3.3 (10.0.3.3) 56(84) bytes of data.
+    64 bytes from 10.0.3.3: icmp_seq=1 ttl=62 time=0.164 ms
+
 
 Traceroute Server:
 
-    $ traceroute 10.0.4.3
-    traceroute to 10.0.4.3 (10.0.4.3), 30 hops max, 60 byte packets
-    1  10.0.0.3 (10.0.0.3)  0.031 ms  0.008 ms  0.006 ms
-    2  10.0.3.3 (10.0.3.3)  0.022 ms  0.011 ms  0.011 ms
-    3  10.0.4.3 (10.0.4.3)  0.023 ms  0.014 ms  0.014 ms
+    $ traceroute 10.0.3.3
+    traceroute to 10.0.3.3 (10.0.3.3), 30 hops max, 60 byte packets
+    1  10.0.0.3 (10.0.0.3)  0.361 ms  0.309 ms  0.293 ms
+    2  10.0.4.3 (10.0.4.3)  0.280 ms  0.252 ms  0.235 ms
+    3  10.0.3.3 (10.0.3.3)  0.219 ms  0.191 ms  0.171 ms
 
 
 ## RIP
@@ -46,15 +39,16 @@ Setup:
 
     $ make rip
 
+
 Check config:
 
     $ docker exec r1 ip route
-    10.0.0.0/24 dev eth1 proto kernel scope link src 10.0.0.3
-    10.0.1.0/24 dev eth2 proto kernel scope link src 10.0.1.2
-    10.0.2.0/24 nhid 8 via 10.0.1.3 dev eth2 proto rip metric 20
-    10.0.3.0/24 dev eth0 proto kernel scope link src 10.0.3.2
-    10.0.4.0/24 nhid 10 via 10.0.3.3 dev eth0 proto rip metric 20
-
+    default via 10.0.4.3 dev eth2
+    10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.3
+    10.0.1.0/24 dev eth1 proto kernel scope link src 10.0.1.2
+    10.0.2.0/24 nhid 10 via 10.0.1.3 dev eth1 proto rip metric 20
+    10.0.3.0/24 nhid 12 via 10.0.4.3 dev eth2 proto rip metric 20
+    10.0.4.0/24 dev eth2 proto kernel scope link src 10.0.4.2
 
     $ docker exec r1 vtysh -c "show running-config"
     Building configuration...
@@ -70,7 +64,7 @@ Check config:
     router rip
     network 10.0.0.0/24
     network 10.0.1.0/24
-    network 10.0.3.0/24
+    network 10.0.4.0/24
     exit
     !
     end
@@ -86,11 +80,12 @@ Show routing info:
         > - selected route, * - FIB route, q - queued, r - rejected, b - backup
         t - trapped, o - offload failure
 
-    C>* 10.0.0.0/24 is directly connected, eth1, 00:01:52
-    C>* 10.0.1.0/24 is directly connected, eth2, 00:01:52
-    R>* 10.0.2.0/24 [120/2] via 10.0.1.3, eth2, weight 1, 00:01:49
-    C>* 10.0.3.0/24 is directly connected, eth0, 00:01:52
-    R>* 10.0.4.0/24 [120/2] via 10.0.3.3, eth0, weight 1, 00:01:49
+    K>* 0.0.0.0/0 [0/0] via 10.0.4.3, eth2, 00:00:30
+    C>* 10.0.0.0/24 is directly connected, eth0, 00:00:30
+    C>* 10.0.1.0/24 is directly connected, eth1, 00:00:30
+    R>* 10.0.2.0/24 [120/2] via 10.0.1.3, eth1, weight 1, 00:00:24
+    R>* 10.0.3.0/24 [120/2] via 10.0.4.3, eth2, weight 1, 00:00:24
+    C>* 10.0.4.0/24 is directly connected, eth2, 00:00:30
 
 
 Show RIP info:
@@ -104,9 +99,9 @@ Show RIP info:
         Network            Next Hop         Metric From            Tag Time
     C(i) 10.0.0.0/24        0.0.0.0               1 self              0
     C(i) 10.0.1.0/24        0.0.0.0               1 self              0
-    R(n) 10.0.2.0/24        10.0.1.3              2 10.0.1.3          0 02:52
-    C(i) 10.0.3.0/24        0.0.0.0               1 self              0
-    R(n) 10.0.4.0/24        10.0.3.3              2 10.0.3.3          0 02:58
+    R(n) 10.0.2.0/24        10.0.1.3              2 10.0.1.3          0 02:48
+    R(n) 10.0.3.0/24        10.0.4.3              2 10.0.4.3          0 02:57
+    C(i) 10.0.4.0/24        0.0.0.0               1 self              0
 
 
 ## OSPF
@@ -125,21 +120,21 @@ Show routing info:
         > - selected route, * - FIB route, q - queued, r - rejected, b - backup
         t - trapped, o - offload failure
 
-    O   10.0.0.0/24 [110/10] is directly connected, eth0, weight 1, 00:01:30
-    C>* 10.0.0.0/24 is directly connected, eth0, 00:01:31
-    O   10.0.1.0/24 [110/10] is directly connected, eth2, weight 1, 00:01:30
-    C>* 10.0.1.0/24 is directly connected, eth2, 00:01:31
-    O>* 10.0.2.0/24 [110/20] via 10.0.1.3, eth2, weight 1, 00:00:40
-      *                      via 10.0.3.3, eth1, weight 1, 00:00:40
-    O   10.0.3.0/24 [110/10] is directly connected, eth1, weight 1, 00:00:50
-    C>* 10.0.3.0/24 is directly connected, eth1, 00:01:31
-    O>* 10.0.4.0/24 [110/20] via 10.0.3.3, eth1, weight 1, 00:00:40
+    O   10.0.0.0/24 [110/10] is directly connected, eth2, weight 1, 00:01:14
+    C>* 10.0.0.0/24 is directly connected, eth2, 00:01:15
+    O   10.0.1.0/24 [110/10] is directly connected, eth0, weight 1, 00:01:14
+    C>* 10.0.1.0/24 is directly connected, eth0, 00:01:15
+    O>* 10.0.2.0/24 [110/20] via 10.0.1.3, eth0, weight 1, 00:00:24
+    *                      via 10.0.4.3, eth1, weight 1, 00:00:24
+    O>* 10.0.3.0/24 [110/20] via 10.0.4.3, eth1, weight 1, 00:00:24
+    O   10.0.4.0/24 [110/10] is directly connected, eth1, weight 1, 00:00:34
+    C>* 10.0.4.0/24 is directly connected, eth1, 00:01:15
 
 
 Show OSPF info:
 
     $ docker exec r1 vtysh -c "show ip ospf"
-    OSPF Routing Process, Router ID: 10.0.3.2
+    OSPF Routing Process, Router ID: 10.0.4.2
     Supports only single TOS (TOS0) routes
     This implementation conforms to RFC2328
     RFC1583Compatibility flag is disabled
@@ -148,8 +143,8 @@ Show OSPF info:
     Minimum hold time between consecutive SPFs 50 millisec(s)
     Maximum hold time between consecutive SPFs 5000 millisec(s)
     Hold time multiplier is currently 1
-    SPF algorithm last executed 8.640s ago
-    Last SPF duration 57 usecs
+    SPF algorithm last executed 34.960s ago
+    Last SPF duration 52 usecs
     SPF timer is inactive
     LSA minimum interval 5000 msecs
     LSA minimum arrival 1000 msecs
@@ -162,15 +157,15 @@ Show OSPF info:
     Number of opaque AS LSA 0. Checksum Sum 0x00000000
     Number of areas attached to this router: 1
     Area ID: 0.0.0.0 (Backbone)
-    Number of interfaces in this area: Total: 3, Active: 3
-    Number of fully adjacent neighbors in this area: 2
-    Area has no authentication
-    SPF algorithm executed 6 times
-    Number of LSA 6
-    Number of router LSA 3. Checksum Sum 0x00009d84
-    Number of network LSA 3. Checksum Sum 0x000163f4
-    Number of summary LSA 0. Checksum Sum 0x00000000
-    Number of ASBR summary LSA 0. Checksum Sum 0x00000000
-    Number of NSSA LSA 0. Checksum Sum 0x00000000
-    Number of opaque link LSA 0. Checksum Sum 0x00000000
-    Number of opaque area LSA 0. Checksum Sum 0x00000000
+      Number of interfaces in this area: Total: 3, Active: 3
+      Number of fully adjacent neighbors in this area: 2
+      Area has no authentication
+      SPF algorithm executed 5 times
+      Number of LSA 6
+      Number of router LSA 3. Checksum Sum 0x00017f9a
+      Number of network LSA 3. Checksum Sum 0x000173dc
+      Number of summary LSA 0. Checksum Sum 0x00000000
+      Number of ASBR summary LSA 0. Checksum Sum 0x00000000
+      Number of NSSA LSA 0. Checksum Sum 0x00000000
+      Number of opaque link LSA 0. Checksum Sum 0x00000000
+      Number of opaque area LSA 0. Checksum Sum 0x00000000

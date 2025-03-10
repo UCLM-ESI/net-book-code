@@ -1,4 +1,4 @@
-FROM router
+FROM lab2-router
 
 RUN apt-get update && \
     apt-get install -y ncat && \

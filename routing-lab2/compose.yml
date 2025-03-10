@@ -9,7 +9,7 @@ x-common: &common-settings
 services:
   r1:
     build: ./router
-    image: router
+    image: lab2-router
     container_name: r1
     hostname: r1
     <<: *common-settings
@@ -19,15 +19,13 @@ services:
     networks:
       N0: { ipv4_address: 10.0.0.3 }
       N1: { ipv4_address: 10.0.1.2 }
-      N3: { ipv4_address: 10.0.3.2 }
+      N4: { ipv4_address: 10.0.4.2 }
 
   r2:
-    image: router
+    image: lab2-router
     container_name: r2
     hostname: r2
     <<: *common-settings
-    depends_on:
-      - r1
     volumes:
       - ./rip/R2-ripd.conf:/etc/frr/ripd.conf
       - ./ospfd.conf:/etc/frr/ospfd.conf
@@ -36,29 +34,25 @@ services:
       N2: { ipv4_address: 10.0.2.2 }
 
   r3:
-    image: router
+    image: lab2-router
     container_name: r3
     hostname: r3
     <<: *common-settings
-    depends_on:
-      - r1
     volumes:
       - ./rip/R3-ripd.conf:/etc/frr/ripd.conf
       - ./ospfd.conf:/etc/frr/ospfd.conf
     networks:
       N2: { ipv4_address: 10.0.2.3 }
-      N3: { ipv4_address: 10.0.3.3 }
-      N4: { ipv4_address: 10.0.4.2 }
+      N3: { ipv4_address: 10.0.3.2 }
+      N4: { ipv4_address: 10.0.4.3 }
 
   server:
     build: ./server
-    image: server
+    image: lab2-server
     container_name: server
     privileged: true
-    depends_on:
-      - r1
     networks:
-      N4: { ipv4_address: 10.0.4.3 }
+      N3: { ipv4_address: 10.0.3.3 }
 
 networks:
   N0:
