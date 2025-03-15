@@ -14,7 +14,8 @@ build:
 	docker compose build
 
 clean: down
-	docker rmi router server
+	-docker rmi lab2-router lab2-server
+	-docker network prune -f
 
 static: restart
 	./setup-static.sh
@@ -25,3 +26,6 @@ rip: restart
 
 ospf: restart
 	./setup-ospf.sh
+
+eigrp: restart
+	./setup-eigrp.sh
