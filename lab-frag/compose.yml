@@ -9,7 +9,7 @@ x-common: &common-settings
 services:
   router:
     build: ./router
-    image: lab1-router
+    image: lab-frag-router
     container_name: router
     hostname: router
     <<: *common-settings
@@ -19,7 +19,7 @@ services:
 
   server:
     build: ./server
-    image: lab1-server
+    image: lab-frag-server
     container_name: server
     <<: *common-settings
     networks:

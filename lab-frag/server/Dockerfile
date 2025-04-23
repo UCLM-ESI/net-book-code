@@ -1,4 +1,4 @@
-FROM lab1-router
+FROM lab-frag-router
 
 RUN apt-get update && \
     apt-get install -y ncat && \
