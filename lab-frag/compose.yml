@@ -1,0 +1,38 @@
+x-common: &common-settings
+  privileged: true
+  restart: "no"
+  ulimits:
+    nofile:
+      soft: 100000
+      hard: 200000
+
+services:
+  router:
+    build: ./router
+    image: lab1-router
+    container_name: r1
+    hostname: r1
+    <<: *common-settings
+    networks:
+      N0: { ipv4_address: 10.0.0.3 }
+      N1: { ipv4_address: 10.0.1.2 }
+
+  server:
+    build: ./server
+    image: lab1-server
+    container_name: server
+    <<: *common-settings
+    networks:
+      N1: { ipv4_address: 10.0.1.3 }
+
+networks:
+  N0:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+  N1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
