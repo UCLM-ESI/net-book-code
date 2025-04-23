@@ -1,6 +1,5 @@
 
-up:
-	docker build -t router router
+up: build
 	docker compose up --remove-orphans -d
 	sudo ./rm-bridge-addrs.sh
 	sudo ./setup-routing.sh
@@ -11,6 +10,7 @@ down:
 restart: down build up
 
 build:
+	docker compose build router
 	docker compose build
 
 clean: down
