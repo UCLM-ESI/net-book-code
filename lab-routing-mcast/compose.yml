@@ -1,0 +1,96 @@
+x-common: &common-settings
+  privileged: true
+  restart: "no"
+  ulimits:
+    nofile:
+      soft: 100000
+      hard: 200000
+
+services:
+  r1:
+    build: ./router
+    image: lab2-router
+    container_name: r1
+    hostname: r1
+    <<: *common-settings
+    volumes:
+      - ./router/r1-pimd.conf:/etc/frr/pimd.conf
+      - ./ospfd.conf:/etc/frr/ospfd.conf
+    networks:
+      N0: { ipv4_address: 10.0.0.3 }
+      N1: { ipv4_address: 10.0.1.2 }
+      N4: { ipv4_address: 10.0.4.2 }
+
+  r2:
+    image: lab2-router
+    container_name: r2
+    hostname: r2
+    <<: *common-settings
+    volumes:
+      - ./router/pimd.conf:/etc/frr/pimd.conf
+      - ./ospfd.conf:/etc/frr/ospfd.conf
+    networks:
+      N1: { ipv4_address: 10.0.1.3 }
+      N2: { ipv4_address: 10.0.2.2 }
+      N5: { ipv4_address: 10.0.5.2 }
+
+  r3:
+    image: lab2-router
+    container_name: r3
+    hostname: r3
+    <<: *common-settings
+    volumes:
+      - ./router/pimd.conf:/etc/frr/pimd.conf
+      - ./ospfd.conf:/etc/frr/ospfd.conf
+    networks:
+      N2: { ipv4_address: 10.0.2.3 }
+      N3: { ipv4_address: 10.0.3.2 }
+      N4: { ipv4_address: 10.0.4.3 }
+
+  server2:
+    build: ./server
+    image: lab3-server2
+    container_name: server2
+    privileged: true
+    networks:
+      N3: { ipv4_address: 10.0.3.3 }
+
+  server1:
+    build: ./server
+    image: lab3-server1
+    container_name: server1
+    privileged: true
+    networks:
+      N5: { ipv4_address: 10.0.5.3 }
+
+networks:
+  N0:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+  N1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+  N2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24
+  N3:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.3.0/24
+  N4:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.4.0/24
+  N5:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.5.0/24
