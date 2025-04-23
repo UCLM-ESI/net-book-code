@@ -10,8 +10,8 @@ services:
   router:
     build: ./router
     image: lab1-router
-    container_name: r1
-    hostname: r1
+    container_name: router
+    hostname: router
     <<: *common-settings
     networks:
       N0: { ipv4_address: 10.0.0.3 }
@@ -36,3 +36,5 @@ networks:
     ipam:
       config:
         - subnet: 10.0.1.0/24
+    driver_opts:
+      com.docker.network.driver.mtu: "400"
