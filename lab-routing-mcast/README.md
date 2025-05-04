@@ -2,6 +2,13 @@
 
 <img src="topology.png" width="90%">
 
+AVISO: Este ejemplo NO FUNCIONA. Trabajo en progreso.
+
+
+Configuración:
+
+RP (Rendezvous Point)
+
 
 Recibir tráfico mcast:
 

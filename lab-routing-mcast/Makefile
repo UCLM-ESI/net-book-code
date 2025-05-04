@@ -17,8 +17,6 @@ clean: down
 	-docker rmi lab2-router lab2-server
 	-docker network prune -f
 
-static: restart
-	./setup-static.sh
-
 pim: restart
+	./setup-static.sh
 	./setup-pim.sh

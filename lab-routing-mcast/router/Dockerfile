@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:trixie
 
 RUN apt-get update && \
     apt-get install -y procps iproute2 iputils-ping traceroute tshark frr nano && \
