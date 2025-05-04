@@ -50,3 +50,9 @@ Qué interfaces llevan a routers PIM:
     eth1       up     10.0.1.2  1         10.0.1.3  0    0
     eth2       up     10.0.4.2  1         10.0.4.3  0    0
     pimreg     up     0.0.0.0   0         local     0    0
+
+
+Comprobar:
+
+- https://github.com/FRRouting/frr/issues/2326
+- https://github.com/ksator/frrouting_demo
