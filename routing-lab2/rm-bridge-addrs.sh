@@ -6,8 +6,8 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 flush_ips() {
-    local bridge_id=br-$1
-    echo $bridge_id
+    local bridge_id=$1
+    echo -n "$bridge_id "
 
     ip link set dev $bridge_id down
     ip addr flush dev $bridge_id
@@ -15,8 +15,10 @@ flush_ips() {
     ip link set dev $bridge_id up
 }
 
-echo Removing bridge addresses...
+echo -n "-- Removing host bridge addresses: "
 
-for bridge in $(docker network ls --filter "driver=bridge" | grep "$(basename $(pwd))" | grep -v N0 | awk '{print $1}'); do
+for bridge in N1 N2 N3; do
     flush_ips $bridge
 done
+
+echo "done"
