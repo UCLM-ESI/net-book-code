@@ -22,5 +22,5 @@ ip netns exec r1 sysctl -w net.ipv4.ip_forward=1
 # Añadir ruta en el anfitrión hacia una red que no existe
 ip route add 10.10.0.0/16 via 192.168.200.1
 
-# Probar: esto debe devolver "Network is unreachable"
+# Comprobar error "Network is unreachable"
 ping -c 1 10.10.1.1
