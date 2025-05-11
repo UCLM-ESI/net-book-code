@@ -27,14 +27,7 @@ services:
 
 networks:
   N0:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.0.0/24
+    ipam: { config: [{subnet: 10.0.0.0/24}] }
   N1:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.1.0/24
-    driver_opts:
-      com.docker.network.driver.mtu: "400"
+    driver_opts: { com.docker.network.driver.mtu: 400 }
+    ipam: { config: [{subnet: 10.0.1.0/24}] }
