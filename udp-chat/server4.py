@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import socket
-import _thread
+from threading import Thread
 server = ('', 12345)
 QUIT = b"bye"
 
@@ -12,8 +12,10 @@ class Chat:
         self.peer = peer
 
     def run(self):
-        _thread.start_new_thread(self.sending, ())
+        sender_thread = Thread(target=self.sending)
+        sender_thread.start()
         self.receiving()
+        sender_thread.join()
         self.sock.close()
 
     def sending(self):
