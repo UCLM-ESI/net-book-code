@@ -60,26 +60,21 @@ services:
 networks:
   N0:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.0.0/24
+    driver_opts: { com.docker.network.bridge.name: N0 }
+    ipam: { config: [{subnet: 10.0.0.0/24}] }
   N1:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.1.0/24
+    driver_opts: { com.docker.network.bridge.name: N1 }
+    ipam: { config: [{subnet: 10.0.1.0/24}] }
   N2:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.2.0/24
+    driver_opts: { com.docker.network.bridge.name: N2 }
+    ipam: { config: [{subnet: 10.0.2.0/24}] }
   N3:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.3.0/24
+    driver_opts: { com.docker.network.bridge.name: N3 }
+    ipam: { config: [{subnet: 10.0.3.0/24}] }
   N4:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.4.0/24
+    driver_opts: { com.docker.network.bridge.name: N4 }
+    ipam: { config: [{subnet: 10.0.4.0/24}] }
