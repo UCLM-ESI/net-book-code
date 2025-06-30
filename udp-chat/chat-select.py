@@ -17,13 +17,14 @@ class Chat:
         fds = [sys.stdin, self.sock]
         while 1:
             ready = select(fds, [], [])[0]
-            if self.sock in ready:
-                msg = self.receiving()
-            else:
-                msg = self.sending()
+            for fd in ready:
+                if self.sock in ready:
+                    msg = self.receiving()
+                else:
+                    msg = self.sending()
 
-            if msg == QUIT:
-                break
+                if msg == QUIT:
+                    return
 
     def sending(self):
         message = input().encode()

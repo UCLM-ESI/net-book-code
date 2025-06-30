@@ -3,7 +3,8 @@
 
 import sys
 import socket
-import _thread
+from threading import Thread
+
 SERVER = ('', 12345)
 QUIT = b'bye'
 
@@ -14,23 +15,23 @@ class Chat:
         self.peer = peer
 
     def run(self):
-        _thread.start_new_thread(self.sending, ())
+        sender_thread = Thread(target=self.sending, daemon=True)
+        sender_thread.start()
         self.receiving()
+        sender_thread.join()
         self.sock.close()
 
     def sending(self):
-        while 1:
+        while True:
             message = input().encode()
             self.sock.sendto(message, self.peer)
-
             if message == QUIT:
                 break
 
     def receiving(self):
-        while 1:
+        while True:
             message, peer = self.sock.recvfrom(1024)
             print("other> {}".format(message.decode()))
-
             if message == QUIT:
                 self.sock.sendto(QUIT, self.peer)
                 break
@@ -48,6 +49,5 @@ if __name__ == '__main__':
         sock.bind(SERVER)
         message, client = sock.recvfrom(0, socket.MSG_PEEK)
         Chat(sock, client).run()
-
     else:
         Chat(sock, SERVER).run()
