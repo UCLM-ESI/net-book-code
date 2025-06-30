@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright: See AUTHORS and COPYING
+
 "usage: %s [--server|--client]"
 
 import sys

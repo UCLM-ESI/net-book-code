@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+# Copyright: See AUTHORS and COPYING
 "Usage: %s <host> <port>"
 
 import sys
 import socket
-from select import select
+import selectors
 SERVER = ('', 12345)
 QUIT = b'bye'
 
@@ -14,16 +15,13 @@ class Chat:
         self.peer = peer
 
     def run(self):
-        fds = [sys.stdin, self.sock]
-        while 1:
-            ready = select(fds, [], [])[0]
-            for fd in ready:
-                if self.sock in ready:
-                    msg = self.receiving()
-                else:
-                    msg = self.sending()
+        selector = selectors.DefaultSelector()
+        selector.register(sys.stdin, selectors.EVENT_READ, self.sending)
+        selector.register(self.sock, selectors.EVENT_READ, self.receiving)
 
-                if msg == QUIT:
+        while 1:
+            for key, mask in selector.select():
+                if key.data() == QUIT:
                     return
 
     def sending(self):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- mode:python; coding:utf-8; tab-width:4 -*-
+# Copyright: See AUTHORS and COPYING
 
 import socket
 from server4 import Chat, server
