@@ -31,8 +31,8 @@ class Chat:
                 break
 
     def receiving(self):
-        while True:
-            message, peer = self.sock.recvfrom(1024)
+        while 1:
+            message, _ = self.sock.recvfrom(1024)
             print("other> {}".format(message.decode()))
             if message == QUIT:
                 self.sock.sendto(QUIT, self.peer)
