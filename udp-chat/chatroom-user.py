@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"usage: %s [--server|--client]"
+"Usage: %s <host> <port>"
 
 import sys
 import socket
@@ -32,23 +32,11 @@ class Chat:
         return message
 
     def receiving(self):
-        message, peer = self.sock.recvfrom(1024)
-        print("other> {}".format(message.decode()))
+        message, _ = self.sock.recvfrom(1024)
+        print(message.decode())
         return message
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print(__doc__ % sys.argv[0])
-        sys.exit()
-
-    mode = sys.argv[1]
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-    if mode == '--server':
-        sock.bind(SERVER)
-        message, client = sock.recvfrom(0, socket.MSG_PEEK)
-        Chat(sock, client).run()
-
-    else:
-        Chat(sock, SERVER).run()
+    Chat(sock, SERVER).run()
