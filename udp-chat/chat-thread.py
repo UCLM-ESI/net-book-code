@@ -28,7 +28,7 @@ class Chat:
 
     def receiving(self):
         while 1:
-            message, peer = self.sock.recvfrom(1024)
+            message, _ = self.sock.recvfrom(1024)
             print("other> {}".format(message.decode()))
 
             if message == QUIT:
@@ -48,6 +48,5 @@ if __name__ == '__main__':
         sock.bind(SERVER)
         message, client = sock.recvfrom(0, socket.MSG_PEEK)
         Chat(sock, client).run()
-
     else:
         Chat(sock, SERVER).run()
