@@ -20,15 +20,15 @@ class Chat:
 
         while 1:
             for key, mask in selector.select():
-                if key.data(key.fileobj) == QUIT:
+                if key.data() == QUIT:
                     return
 
-    def sending(self, fd):
+    def sending(self):
         message = input().encode()
         self.sock.sendto(message, self.peer)
         return message
 
-    def receiving(self, fd):
+    def receiving(self):
         message, _ = self.sock.recvfrom(1024)
         print("other> {}".format(message.decode()))
         return message
