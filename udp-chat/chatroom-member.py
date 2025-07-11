@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Copyright: See AUTHORS and COPYING
-"Usage: %s <host> <port>"
 
 import sys
 import socket
@@ -10,8 +9,8 @@ QUIT = b'bye'
 
 
 class Chat:
-    def __init__(self, sock, peer):
-        self.sock = sock
+    def __init__(self, peer):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.peer = peer
 
     def run(self):
@@ -35,6 +34,7 @@ class Chat:
         return message
 
 
-if __name__ == '__main__':
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    Chat(sock, SERVER).run()
+try:
+    Chat(SERVER).run()
+except KeyboardInterrupt:
+    print("shut down.")
