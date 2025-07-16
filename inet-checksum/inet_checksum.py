@@ -21,3 +21,15 @@ def cksum(pkt):
         s = ((s >> 8) & 0xff) | s << 8
 
     return s & 0xffff
+
+
+def cksum_good(header_bytes):
+    assert len(header_bytes) % 2 == 0, "El tamaño debe ser par"
+
+    checksum = 0
+    for i in range(0, len(header_bytes), 2):
+        word = (header_bytes[i] << 8) + header_bytes[i+1]
+        checksum += word
+        checksum = (checksum & 0xFFFF) + (checksum >> 16)
+
+    return ~checksum & 0xFFFF
