@@ -4,7 +4,6 @@
 
 import time
 import socket
-import struct
 from string import printable
 
 from inet_checksum import cksum
@@ -39,7 +38,7 @@ def hexdump(frame, with_time=False):
 
 def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_RAW,
-                        socket.getprotobyname('icmp'))
+                         socket.getprotobyname('icmp'))
 
     while 1:
         msg = sock.recv(1600)
