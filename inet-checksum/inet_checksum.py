@@ -1,18 +1,17 @@
 #!/usr/bin/python3
 "Internet checksum algorithm RFC-1071"
 # from scapy:
-# https://github.com/secdev/scapy/blob/master/scapy/utils.py
+# https://github.com/secdev/scapy/blob/0f7b0c0db7507b5af1c2e26e30668c8c976ea643/scapy/utils.py#L595
 
 import sys
-import struct
 import array
 
 
-def cksum(pkt):
-    # type: (bytes) -> int
+def scapy_cksum(pkt: bytes) -> int:
     if len(pkt) % 2 == 1:
-        pkt += b'\0'
-    s = sum(array.array('H', pkt))
+        pkt += b'\0'  # little endian only
+
+    s = sum(array.array('H', pkt))  # native byte order
     s = (s >> 16) + (s & 0xffff)
     s += s >> 16
     s = ~s
@@ -23,13 +22,31 @@ def cksum(pkt):
     return s & 0xffff
 
 
-def cksum_good(header_bytes):
-    assert len(header_bytes) % 2 == 0, "El tamaño debe ser par"
+def rfc_cksum(data: bytes) -> int:
+    if len(data) % 2 == 1:
+        data += b'\0'  # little endian only
 
-    checksum = 0
-    for i in range(0, len(header_bytes), 2):
-        word = (header_bytes[i] << 8) + header_bytes[i+1]
-        checksum += word
-        checksum = (checksum & 0xFFFF) + (checksum >> 16)
+    total = sum(array.array('H', data))   # native byte order
 
-    return ~checksum & 0xFFFF
+    while (total >> 16):
+        total = (total >> 16) + (total & 0xffff)
+
+    if sys.byteorder == 'little':
+        total = ((total >> 8) & 0xff) | total << 8
+
+    return ~total & 0xffff
+
+
+def portable_cksum(data: bytes) -> int:
+    if len(data) % 2 == 1:
+        data += b'\0'
+
+    total = 0
+    for i in range(0, len(data), 2):
+        total += (data[i] << 8) + data[i+1]  # big endian
+        total = (total & 0xffff) + (total >> 16)
+
+    return ~total & 0xffff
+
+
+cksum = rfc_cksum

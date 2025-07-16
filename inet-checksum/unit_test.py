@@ -1,9 +1,10 @@
-import os
 import struct
-import random
 from unittest import TestCase
 
-from inet_checksum import cksum, cksum_good
+from inet_checksum import scapy_cksum, rfc_cksum
+# from inet_checksum import scapy_cksum as cksum
+# from inet_checksum import rfc_cksum as cksum
+from inet_checksum import portable_cksum as cksum
 
 
 class CheckSumTests(TestCase):
@@ -18,9 +19,14 @@ class CheckSumTests(TestCase):
     def test_ip_header_verify(self):
         self.try_cksum('45000073000040004011b861c0a80001c0a800c7', b'\x00\x00')
 
-    def test_ip_header_2(self):
+    def test_ip_header_notebook(self):
         data = bytes.fromhex('450000540000400040010000C0A80001C0A800C7')
-        result = cksum_good(data).to_bytes(2, 'big')
+        result = scapy_cksum(data).to_bytes(2, 'big')
+        self.assertEqual(result, b'\xb8\x90')
+
+    def test_ip_header_notebook_check(self):
+        data = bytes.fromhex('450000540000400040010000C0A80001C0A800C7')
+        result = scapy_cksum(data).to_bytes(2, 'big')
         self.assertEqual(result, b'\xb8\x90')
 
     def test_captured_icmp(self):
@@ -66,13 +72,9 @@ class CheckSumTests(TestCase):
 
         self.assertEqual(verify, 0)
 
-    def test_100(self):
-        for i in range(100):
-            size = random.randint(1000, 100000)
-            if size % 2 == 1:
-                size += 1
-            data = os.urandom(size)
-            data = bytes.fromhex('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
-            checksum1 = cksum(data)
-            checksum2 = cksum_good(data)
-            self.assertEqual(checksum1, checksum2, f"Checksum mismatch {data.hex()}")
+    def test_17bits_carry(self):
+        size = 65538
+        data = b'\xFF' * (size)
+        checksum1 = scapy_cksum(data)
+        checksum2 = rfc_cksum(data)
+        self.assertEqual(checksum1, checksum2, f"Checksum mismatch {data.hex()}")
