@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-# Copyright: See AUTHORS and COPYING
-
 "usage: %s [--server|--client]"
 
 import sys
 import socket
-from select import select
+import selectors
 SERVER = ('', 12345)
 QUIT = b'bye'
 
@@ -16,16 +14,13 @@ class Chat:
         self.peer = peer
 
     def run(self):
-        fds = [sys.stdin, self.sock]
-        while 1:
-            ready = select(fds, [], [])[0]
-            for fd in ready:
-                if self.sock in ready:
-                    msg = self.receiving()
-                else:
-                    msg = self.sending()
+        selector = selectors.DefaultSelector()
+        selector.register(sys.stdin, selectors.EVENT_READ, self.sending)
+        selector.register(self.sock, selectors.EVENT_READ, self.receiving)
 
-                if msg == QUIT:
+        while 1:
+            for key, mask in selector.select():
+                if key.data() == QUIT:
                     return
 
     def sending(self):
@@ -34,7 +29,7 @@ class Chat:
         return message
 
     def receiving(self):
-        message, peer = self.sock.recvfrom(1024)
+        message, _ = self.sock.recvfrom(1024)
         print("other> {}".format(message.decode()))
         return message
 
@@ -49,8 +44,8 @@ if __name__ == '__main__':
 
     if mode == '--server':
         sock.bind(SERVER)
-        message, client = sock.recvfrom(0, socket.MSG_PEEK)
-        Chat(sock, client).run()
-
+        message, peer = sock.recvfrom(0, socket.MSG_PEEK)
     else:
-        Chat(sock, SERVER).run()
+        peer = SERVER
+
+    Chat(sock, peer).run()

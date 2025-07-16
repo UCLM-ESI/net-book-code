@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright: See AUTHORS and COPYING
 
 import socket
 from threading import Thread
@@ -34,6 +35,7 @@ class Chat:
             if message == QUIT:
                 self.sock.sendto(QUIT, self.peer)
                 break
+
 
 if __name__ == '__main__':
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
