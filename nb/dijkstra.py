@@ -1,13 +1,13 @@
 import heapq
 
 
-def dijkstra(graph, source):
+def dijkstra(graph, source, destination=None):
     # Initialize costs as inf and source cost to 0
     costs = {node: float('inf') for node in graph}
     costs[source] = 0
     previous_nodes = {node: None for node in graph}
-
     priority_queue = [(0, source)]  # Priority queue with tentative costs
+    visited = []
 
     while priority_queue:
         # Select node with the smallest tentative cost
@@ -16,6 +16,10 @@ def dijkstra(graph, source):
         # Ignore if it's not better than tentative
         if current_cost > costs[current_node]:
             continue
+
+        visited.append(current_node)
+        if destination and current_node == destination:
+            break
 
         # Update neighbors tentative labels
         for neighbor, weight in graph[current_node].items():
@@ -26,24 +30,25 @@ def dijkstra(graph, source):
                 previous_nodes[neighbor] = current_node
                 heapq.heappush(priority_queue, (cost, neighbor))
 
-    return costs, previous_nodes
+    return costs, previous_nodes, visited
 
 
 class Network:
     def __init__(self, links):
-        self.links = links
+        self.graph = links
 
     def get_path(self, source, destination):
-        costs, previous_nodes = dijkstra(self.links, source)
+        costs, previous_nodes, visited = dijkstra(self.graph, source)
         path = []
         current_node = destination
         while current_node is not None:
             path.append(current_node)
             current_node = previous_nodes[current_node]
+
         return list(reversed(path))
 
     def get_paths(self, source):
-        nodes = self.links.keys()
+        nodes = self.graph.keys()
         paths = {}
         for dest in nodes:
             paths[dest] = self.get_path(source, dest)
