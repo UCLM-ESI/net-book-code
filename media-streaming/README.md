@@ -3,9 +3,6 @@ Flow control for media stream
 
 The server's sending rate automatically adapts to the MP3 player's bitrate thanks to flow control.
 
-Preguntar a ChatGPT
-
-
 run server:
 
 ```
